@@ -1,0 +1,14 @@
+{
+  "name": "watchtimedout",
+  "version": "1.0.0",
+  "description": "watch timed out ",
+  "main": "controller.js",
+  "scripts": {
+    "start": "node controller.js"
+  },
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "@kubernetes/client-node": "^0.15.0"
+  }
+}

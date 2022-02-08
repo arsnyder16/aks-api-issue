@@ -1,0 +1,68 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: slowrequest-node
+  namespace: api-issue
+spec:
+  parallelism: 5
+  completions: 5
+  template:  
+    metadata:
+      labels:
+        app: slowrequest-node
+    spec:
+      restartPolicy: Never
+      volumes:
+      - name: shared-data
+        hostPath:
+          path: /shared-data
+      containers:
+      - name: slowrequest-node
+        image: {acr}.azurecr.io/slowrequest-node:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "50Mi"
+          limits:
+            memory: "75Mi"
+      - name: tcpdump
+        image: corfr/tcpdump
+        resources:
+          requests:
+            memory: "20Mi"
+          limits:
+            memory: "20Mi"
+        command:
+        - "/usr/sbin/tcpdump"
+        - "-C"
+        - "50"
+        - "-i"
+        - "any"
+        - "-nn"
+        - "-w"
+        - "/shared-data/cap-pod.pcap"
+        volumeMounts:
+        - name: shared-data
+          mountPath: /shared-data
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: job-manager
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/status"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: job-manager
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: api-issue
+roleRef:
+  kind: ClusterRole
+  name: job-manager
+  apiGroup: rbac.authorization.k8s.io
