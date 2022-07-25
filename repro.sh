@@ -23,6 +23,15 @@ az aks create \
   --uptime-sla \
   --enable-encryption-at-host
 
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm upgrade --install nginx ingress-nginx/ingress-nginx \
+  --create-namespace \
+  --namespace ingress \
+  --set controller.replicaCount=0 \
+  --set controller.service.externalTrafficPolicy=Local \
+  --wait
+
 az aks get-credentials --name $aks --resource-group $rg
 
 kubectl create namespace api-issue
