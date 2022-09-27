@@ -44,7 +44,7 @@ sed "s/{acr}/$acr/g" node.yaml | kubectl apply -n api-issue -f -
 
 # does not need to point at anything all that seems required is that a public ingress ip address is created
 # even if this points to something valid it make no difference
-# intermittent issues in the jobs created above will start appearing
+# intermittent TLS handshake issues in the jobs created above will start appearing
 kubectl apply -f - << EOF
 apiVersion: v1
 kind: Service
